@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>为了更懂你 · 一份小小的问卷</title>
+<meta name="description" content="有人认真出了一份问卷，想更懂你一点点。填完把结果发回去就行。" />
+<style>
+  :root {
+    --bg: #faf9f7;
+    --surface: #ffffff;
+    --ink: #3a3733;
+    --ink-soft: #7d7770;
+    --line: #e8e4de;
+    --rose: #c98a8a;
+    --rose-deep: #b06e6e;
+    --rose-soft: #f6ecec;
+    --sage: #8fa396;
+    --sage-soft: #edf2ee;
+    --amber: #c9a97a;
+    --radius: 14px;
+    --font-serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--font-sans); line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--rose-soft); color: var(--rose-deep); }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 22px 90px; }
+
+  /* ---------- 封面 ---------- */
+  #intro { text-align: center; padding: 90px 0 40px; }
+  .stamp {
+    display: inline-block; font-size: 12px; letter-spacing: 4px;
+    color: var(--rose-deep); border: 1px solid var(--rose);
+    border-radius: 999px; padding: 4px 18px; margin-bottom: 26px;
+  }
+  #intro h1 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 6vw, 42px); letter-spacing: 4px; line-height: 1.5; }
+  #intro h1 em { font-style: normal; color: var(--rose-deep); }
+  #intro p.lead { margin: 20px auto 0; color: var(--ink-soft); font-size: 15px; max-width: 440px; }
+  .intro-meta { margin-top: 30px; display: flex; justify-content: center; gap: 26px; font-size: 13px; color: var(--ink-soft); }
+  .intro-meta b { font-family: var(--font-serif); font-size: 20px; color: var(--ink); display: block; line-height: 1.4; }
+  .start-btn { margin-top: 42px; }
+
+  .btn {
+    display: inline-block; cursor: pointer; user-select: none;
+    border: none; border-radius: 999px; font-size: 14px;
+    padding: 11px 34px; letter-spacing: 2px;
+    background: var(--ink); color: #fff; transition: opacity .2s, transform .15s;
+    font-family: var(--font-sans); text-decoration: none;
+  }
+  .btn:hover { opacity: .85; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn.ghost:hover { border-color: var(--rose); color: var(--rose-deep); }
+
+  /* ---------- 问卷进度 ---------- */
+  #progressWrap {
+    position: sticky; top: 0; z-index: 5; display: none;
+    background: rgba(250,249,247,.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line); padding: 12px 0;
+  }
+  .progress-inner { max-width: 720px; margin: 0 auto; padding: 0 22px; display: flex; align-items: center; gap: 14px; }
+  .progress-inner .lbl { font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
+  .pbar { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .pbar-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--sage), var(--rose)); transition: width .4s ease; }
+
+  /* ---------- 问卷分区 ---------- */
+  .section-card { display: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 34px 30px; margin-top: 30px; box-shadow: 0 1px 2px rgba(60,50,40,.03); }
+  .section-card.show { display: block; animation: rise .45s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .sec-tag { font-family: var(--font-serif); font-size: 13px; color: var(--rose); letter-spacing: 3px; }
+  .sec-title { font-family: var(--font-serif); font-size: 24px; font-weight: 600; letter-spacing: 2px; margin: 2px 0 6px; }
+  .sec-sub { color: var(--ink-soft); font-size: 13.5px; margin-bottom: 22px; }
+
+  .q { margin-bottom: 24px; }
+  .q:last-child { margin-bottom: 0; }
+  .q-label { font-size: 14.5px; font-weight: 600; margin-bottom: 10px; }
+  .q-label .must { color: var(--rose); margin-left: 4px; font-weight: 400; font-size: 12px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip {
+    cursor: pointer; user-select: none; font-size: 13.5px;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 18px; color: var(--ink-soft);
+    transition: all .15s; background: #fff;
+  }
+  .chip:hover { border-color: var(--rose); color: var(--rose-deep); }
+  .chip.on { background: var(--rose-soft); border-color: var(--rose-deep); color: var(--rose-deep); }
+  .chip.sage.on { background: var(--sage-soft); border-color: var(--sage); color: #5f7a6b; }
+
+  input[type="text"], textarea {
+    width: 100%; font-family: var(--font-sans); font-size: 14px;
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 14px; background: var(--bg); color: var(--ink);
+    outline: none; transition: border-color .15s; resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--rose); background: #fff; }
+
+  input[type="range"] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 999px; background: var(--line); outline: none; }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--rose); border: 3px solid #fff;
+    box-shadow: 0 0 0 1px var(--rose); cursor: pointer;
+  }
+  .range-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+  .range-val { text-align: center; font-family: var(--font-serif); font-size: 15px; color: var(--rose-deep); margin-top: 2px; }
+
+  .nav-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; }
+  .err-tip { color: var(--rose-deep); font-size: 12.5px; margin-top: 12px; display: none; }
+
+  /* ---------- 报告 ---------- */
+  #report { display: none; margin-top: 34px; }
+  .r-head { text-align: center; padding: 10px 0 26px; }
+  .r-head .stamp2 { font-size: 12px; letter-spacing: 4px; color: var(--sage); border: 1px solid var(--sage); border-radius: 999px; padding: 4px 16px; display: inline-block; margin-bottom: 18px; }
+  .r-head h2 { font-family: var(--font-serif); font-size: clamp(24px, 5vw, 34px); font-weight: 600; letter-spacing: 3px; }
+  .r-head h2 em { font-style: normal; color: var(--rose-deep); }
+  .r-head p { color: var(--ink-soft); font-size: 13.5px; margin-top: 8px; }
+
+  .r-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 28px; margin-bottom: 18px; }
+  .r-card h3 { font-family: var(--font-serif); font-size: 17px; letter-spacing: 2px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .r-card h3 .ico { width: 24px; height: 24px; border-radius: 50%; background: var(--rose-soft); color: var(--rose-deep); font-size: 12px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .r-card.sage h3 .ico { background: var(--sage-soft); color: #5f7a6b; }
+  .r-card.amber h3 .ico { background: #f4ead9; color: #9a7a4a; }
+  .r-card p { font-size: 14px; color: var(--ink); }
+  .r-card .muted { color: var(--ink-soft); font-size: 13px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { font-size: 12.5px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; color: var(--ink-soft); }
+  .r-list { list-style: none; }
+  .r-list li { font-size: 14px; padding: 7px 0 7px 22px; position: relative; border-bottom: 1px dashed var(--line); }
+  .r-list li:last-child { border-bottom: none; }
+  .r-list li::before { content: "·"; position: absolute; left: 8px; color: var(--rose); font-weight: 700; }
+  .quote { font-family: var(--font-serif); font-size: 16px; letter-spacing: 1px; color: var(--rose-deep); text-align: center; padding: 6px 10px; }
+  .danger { background: #fbf3f0; border-color: #ecd2c8; }
+  .danger h3 .ico { background: #f3ded5; color: #b06a4e; }
+
+  .report-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 26px; }
+  .send-box {
+    display: none; margin-top: 22px; text-align: center;
+    background: var(--sage-soft); border: 1px solid #cdddd2;
+    border-radius: var(--radius); padding: 22px 24px;
+  }
+  .send-box.show { display: block; animation: rise .45s ease; }
+  .send-box .big { font-family: var(--font-serif); font-size: 18px; letter-spacing: 2px; color: #5f7a6b; }
+  .send-box p { font-size: 13px; color: var(--ink-soft); margin: 8px 0 14px; }
+
+  footer { border-top: 1px solid var(--line); padding: 34px 22px 46px; text-align: center; color: var(--ink-soft); font-size: 12.5px; letter-spacing: 1px; }
+  footer .sig { font-family: var(--font-serif); font-size: 14px; color: var(--rose); margin-bottom: 8px; }
+
+  @media (max-width: 520px) {
+    .section-card { padding: 26px 20px; }
+  }
+  .chip { font-family: inherit; line-height: 1.6; min-height: 44px; }
+  :focus-visible { outline: 3px solid var(--sage); outline-offset: 4px; }
+  .r-card p + p { margin-top: 10px; }
+  .review-missing { margin-top: 20px; } .review-missing .btn { margin: 12px 6px 0 0; }
+  .progress-inner .lbl { white-space: normal; }
+  @media(max-width: 520px) { #intro { padding-top: 50px; } .stamp { font-size: 10px; letter-spacing: 2px; padding: 5px 12px; } .wrap { padding-inline: 16px; } .nav-row .btn { padding: 12px 18px; letter-spacing: 0; } .r-card { padding: 22px 18px; overflow-wrap: anywhere; } .send-box { padding: 22px 14px; } .btn { max-width: 100%; } }
+  @media(prefers-reduced-motion: reduce) { *,html { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<div id="progressWrap">
+  <div class="progress-inner">
+    <span class="lbl" id="progressLbl">开始填写</span>
+    <div class="pbar"><div class="pbar-fill" id="pbarFill"></div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ 封面（给「TA」看） ============ -->
+  <div id="intro">
+    <span class="stamp">SOMEONE LIKES YOU · 问卷编号 001</span>
+    <h1>听说，<br />有人想更<em>懂你</em>一点点</h1>
+    <p class="lead">有个人认真出了一份问卷——关于你喜欢的口味、音乐、性格节奏，还有约会的种种。没有对错，凭直觉选就好。填完把结果发回去，剩下的交给 TA。</p>
+    <div class="intro-meta">
+      <div><b id="metaQ">20</b>道题目</div>
+      <div><b>5</b>大板块</div>
+      <div><b>~5</b>分钟</div>
+    </div>
+    <div class="start-btn">
+      <button class="btn" id="startBtn">开始作答</button>
+    </div>
+    <p style="margin-top:18px;font-size:12px;color:var(--ink-soft);">草稿保存在当前浏览器，可随时修改。除昵称外均可跳过。<br>分享链接包含未加密的答案，拿到链接的人都能查看；请勿填写住址、联系方式等私密信息。</p>
+  </div>
+
+  <!-- ============ 问卷 ============ -->
+  <div id="quizArea"></div>
+
+  <!-- ============ 报告 ============ -->
+  <div id="report">
+    <div class="r-head">
+      <span class="stamp2" id="rStamp">ANSWER COLLECTED · 问卷已回收</span>
+      <h2 id="rTitle">TA 的约会行动指南</h2>
+      <p id="rSub"></p>
+    </div>
+    <div id="reportBody"></div>
+
+    <!-- 「TA」填完后的回传面板 -->
+    <div class="send-box" id="sendBox">
+      <div class="big">填好啦，接下来交给你 ✉</div>
+      <p>先检查上方档案，再决定是否分享。链接包含未加密的答案，请只发给信任的人；转发后无法远程撤回。</p>
+      <button class="btn" id="sendLinkBtn">复制精简链接 · 发给出题人</button>
+    </div>
+
+    <div class="report-actions" id="reportActions">
+      <button class="btn" id="saveImgBtn">保存为图片</button>
+      <button class="btn ghost" id="retakeBtn">返回修改</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="sig">—— 认真回答的人，会被认真对待 ——</div>
+  约会情报局 · 问卷编号 001
+</footer>
+
+<script>
+(async function () {
+  "use strict";
+
+  /* =====================================================
+     问卷定义（全部用「你」的口吻，面向TA填写）
+  ===================================================== */
+  var SECTIONS = [
+    {
+      tag: "PART 1", title: "先认识一下你", sub: "档案需要一个封面——我们该怎么称呼你？",
+      qs: [
+        { id: "name", type: "text", label: "怎么称呼你", must: true, ph: "例如：小鹿、阿澄、随你怎么叫" },
+        { id: "rel", type: "single", label: "你觉得我们现在算什么阶段", opts: ["还在暧昧试探", "刚在一起", "约会过几次", "老朋友，想更进一步", "普通朋友", "还在了解", "暂不回答"] },
+        { id: "budget", type: "single", label: "你对约会的消费态度", opts: ["经济实惠也开心", "中等，正常约会水平", "重要日子可以隆重一点"] }
+      ]
+    },
+    {
+      tag: "PART 2", title: "吃喝口味", sub: "从「要不要一起吃个饭」开始，了解彼此的口味。",
+      qs: [
+        { id: "taste", type: "multi", label: "你喜欢的口味 / 菜系（可多选）", opts: ["川湘辣口", "清淡本味", "日料", "火锅", "烧烤", "西餐", "烘焙甜品", "街边小吃", "素食", "无辣不欢"] },
+        { id: "avoid", type: "text", label: "你不吃 / 过敏 / 讨厌的食物", ph: "例如：不吃香菜、海鲜过敏、讨厌内脏" },
+        { id: "drink", type: "multi", label: "你平时喝什么（可多选）", opts: ["奶茶", "咖啡", "果汁", "气泡水", "茶", "酒（微醺型）", "酒（爱好者）", "白开水星人"] },
+        { id: "sweet", type: "slider", label: "你对甜品的热爱程度", min: 1, max: 5, lo: "碰都不碰", hi: "甜品是本命" }
+      ]
+    },
+    {
+      tag: "PART 3", title: "音乐与娱乐", sub: "从共同喜欢的事情开始，慢慢聊到彼此。",
+      qs: [
+        { id: "music", type: "multi", label: "你常听的音乐风格（可多选）", opts: ["流行", "民谣", "摇滚", "说唱", "电子", "爵士", "古典", "K-Pop", "老歌", "什么都听"] },
+        { id: "singer", type: "text", label: "你最近单曲循环的歌手 / 歌曲", ph: "写你歌单里出现最多的名字" },
+        { id: "movie", type: "multi", label: "你喜欢的电影 / 剧类型（可多选）", opts: ["爱情", "喜剧", "悬疑推理", "科幻", "动画", "纪录片", "恐怖（胆大型）", "恐怖（嘴上说怕还要看）"] },
+        { id: "hobby", type: "multi", label: "你的休闲方式（可多选）", opts: ["追剧刷综艺", "打游戏", "看小说漫画", "逛街探店", "运动健身", "拍照记录", "手工DIY", "撸猫撸狗", "剧本杀桌游", "宅着放空"] }
+      ]
+    },
+    {
+      tag: "PART 4", title: "性格与节奏", sub: "了解你的频道，才能安排得刚刚好。",
+      qs: [
+        { id: "personality", type: "multi", label: "你的性格更接近（可多选）", opts: ["内向慢热，熟了才放得开", "外向活泼，自来熟", "随和佛系，都行都可以", "敏感细腻，在意细节"] },
+        { id: "energy", type: "single", label: "你的充电方式", opts: ["独处充电，热闹久了会累", "社交充电，人越多越嗨", "看情况，都需要"] },
+        { id: "clock", type: "single", label: "你的作息类型", opts: ["早鸟型，晚上十点就困", "夜猫型，越晚越精神", "作息不固定，提前商量"] },
+        { id: "travel", type: "single", label: "出去玩，你更想去", opts: ["看海发呆", "爬山吸氧", "城市漫步压马路", "古镇拍照", "哪都不去，宅着最舒服"] }
+      ]
+    },
+    {
+      tag: "PART 5", title: "约会偏好与心动细节", sub: "最后一部分：直接关系到下一次约会怎么安排。",
+      qs: [
+        { id: "dateType", type: "multi", label: "你可能喜欢的约会类型（可多选）", opts: ["看展看剧", "公园野餐", "爬山徒步", "市集探店", "看电影", "运动打球", "一起做饭", "livehouse", "游乐园", "书店咖啡厅"] },
+        { id: "rhythm", type: "single", label: "你更喜欢怎样的安排", opts: ["精心策划的仪式感", "随性自然的松弛感", "都喜欢，看当天心情"] },
+        { id: "gift", type: "single", label: "收礼物时你最在意", opts: ["实用性，日常用得上", "心意，手工 / 走心更重要", "惊喜感，盲盒式的快乐", "仪式感，包装和氛围都要到位"] },
+        { id: "wish", type: "text", label: "你最近的小心愿 / 想要的东西", ph: "哪怕只是随口一提……（有人会记小本本的）" },
+        { id: "mine", type: "area", label: "雷区警报：和你相处千万别做什么", ph: "例如：提前商量安排、不拍未经同意的照片、尊重独处时间" },
+        { id: "dream", type: "area", label: "用你的话形容：理想的约会是什么样的", ph: "例如：不用太隆重，找个舒服的地方，聊聊天，散散步就好" }
+      ]
+    }
+  ];
+
+  var totalQ = 0;
+  SECTIONS.forEach(function (s) { totalQ += s.qs.length; });
+  document.getElementById("metaQ").textContent = totalQ;
+
+  /* =====================================================
+     状态：本地草稿 + 链接回传
+  ===================================================== */
+  var STORE_KEY = "date_survey_v3";
+  var answers = {};
+  var receivedMode = false;
+
+  // Frozen v1 schema: new questions/options must use a new schema version.
+  var SHARE_SCHEMA_V1 = [{"id":"name","type":"text"},{"id":"rel","type":"single","opts":["还在暧昧试探","刚在一起","约会过几次","老朋友，想更进一步","普通朋友","还在了解","暂不回答"]},{"id":"budget","type":"single","opts":["经济实惠也开心","中等，正常约会水平","重要日子可以隆重一点"]},{"id":"taste","type":"multi","opts":["川湘辣口","清淡本味","日料","火锅","烧烤","西餐","烘焙甜品","街边小吃","素食","无辣不欢"]},{"id":"avoid","type":"text"},{"id":"drink","type":"multi","opts":["奶茶","咖啡","果汁","气泡水","茶","酒（微醺型）","酒（爱好者）","白开水星人"]},{"id":"sweet","type":"slider"},{"id":"music","type":"multi","opts":["流行","民谣","摇滚","说唱","电子","爵士","古典","K-Pop","老歌","什么都听"]},{"id":"singer","type":"text"},{"id":"movie","type":"multi","opts":["爱情","喜剧","悬疑推理","科幻","动画","纪录片","恐怖（胆大型）","恐怖（嘴上说怕还要看）"]},{"id":"hobby","type":"multi","opts":["追剧刷综艺","打游戏","看小说漫画","逛街探店","运动健身","拍照记录","手工DIY","撸猫撸狗","剧本杀桌游","宅着放空"]},{"id":"personality","type":"multi","opts":["内向慢热，熟了才放得开","外向活泼，自来熟","随和佛系，都行都可以","敏感细腻，在意细节"]},{"id":"energy","type":"single","opts":["独处充电，热闹久了会累","社交充电，人越多越嗨","看情况，都需要"]},{"id":"clock","type":"single","opts":["早鸟型，晚上十点就困","夜猫型，越晚越精神","作息不固定，提前商量"]},{"id":"travel","type":"single","opts":["看海发呆","爬山吸氧","城市漫步压马路","古镇拍照","哪都不去，宅着最舒服"]},{"id":"dateType","type":"multi","opts":["看展看剧","公园野餐","爬山徒步","市集探店","看电影","运动打球","一起做饭","livehouse","游乐园","书店咖啡厅"]},{"id":"rhythm","type":"single","opts":["精心策划的仪式感","随性自然的松弛感","都喜欢，看当天心情"]},{"id":"gift","type":"single","opts":["实用性，日常用得上","心意，手工 / 走心更重要","惊喜感，盲盒式的快乐","仪式感，包装和氛围都要到位"]},{"id":"wish","type":"text"},{"id":"mine","type":"area"},{"id":"dream","type":"area"}];
+  function compactAnswers(raw) {
+    var values = SHARE_SCHEMA_V1.map(function(q) {
+      var v = raw[q.id];
+      if (q.type === "multi") return Array.isArray(v) && v.length ? v.reduce(function(mask, option) { var i = q.opts.indexOf(option); return i < 0 ? mask : mask | (1 << i); }, 0) : null;
+      if (q.type === "single") { var i = q.opts.indexOf(v); return i < 0 ? null : i; }
+      return v === undefined || v === "" ? null : v;
+    });
+    while (values.length && values[values.length-1] === null) values.pop();
+    return values;
+  }
+  function expandAnswers(values) {
+    if (!Array.isArray(values) || values.length > SHARE_SCHEMA_V1.length) throw new Error("无效结果");
+    var raw = {};
+    values.forEach(function(v, i) {
+      if (v === null) return;
+      var q = SHARE_SCHEMA_V1[i];
+      if (q.type === "multi") { if (!Number.isInteger(v) || v < 0 || v >= Math.pow(2,q.opts.length)) throw new Error("无效选项"); raw[q.id] = q.opts.filter(function(o,j) { return (v & (1 << j)) !== 0; }); }
+      else if (q.type === "single") { if (!Number.isInteger(v) || !q.opts[v]) throw new Error("无效选项"); raw[q.id] = q.opts[v]; }
+      else raw[q.id] = v;
+    });
+    return raw;
+  }
+  function toBase64url(bytes) { return btoa(String.fromCharCode.apply(null, bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+  function fromBase64url(text) {
+    if (!/^[A-Za-z0-9_-]+$/.test(text) || text.length > 20000) throw new Error("无效链接");
+    return Uint8Array.from(atob(text.replace(/-/g, "+").replace(/_/g, "/")), function(c) { return c.charCodeAt(0); });
+  }
+  async function transformBytes(bytes, stream) {
+    var reader = new Blob([bytes]).stream().pipeThrough(stream).getReader(), parts = [], size = 0;
+    try { while (true) { var item = await reader.read(); if (item.done) break; size += item.value.length; if (size > 20000) { await reader.cancel(); throw new Error("结果过长"); } parts.push(item.value); } }
+    finally { reader.releaseLock(); }
+    var result = new Uint8Array(size), offset = 0; parts.forEach(function(p) { result.set(p,offset); offset += p.length; }); return result;
+  }
+  async function encodeShare(raw) {
+    var bytes = new TextEncoder().encode(JSON.stringify(compactAnswers(raw)));
+    var plain = "#s=1u" + toBase64url(bytes);
+    try { var compressed = "#s=1z" + toBase64url(await transformBytes(bytes,new CompressionStream("deflate"))); return compressed.length < plain.length ? compressed : plain; }
+    catch(e) { return plain; }
+  }
+  async function decodeShare(hash) {
+    if (hash.indexOf("#d=") === 0) return JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(hash.slice(3))))));
+    var match = hash.match(/^#s=1([uz])([A-Za-z0-9_-]+)$/); if (!match) throw new Error("无效链接版本");
+    var bytes = fromBase64url(match[2]);
+    if (match[1] === "z") bytes = await transformBytes(bytes,new DecompressionStream("deflate"));
+    return expandAnswers(JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(bytes)));
+  }
+
+  // 打开时检查链接里是否带了别人填好的结果（#d=...）
+  var hashMatch = window.location.hash.match(/^#(?:d|s)=.+$/);
+  if (hashMatch) {
+    try {
+      answers = cleanAnswers(await decodeShare(window.location.hash));
+      receivedMode = true;
+    } catch (e) { answers = {}; document.getElementById("intro").insertAdjacentHTML("afterbegin", '<p role="alert">结果链接无法读取。请向分享者索取完整链接，或重新填写。</p>'); }
+  }
+
+  if (!receivedMode) {
+    try { answers = cleanAnswers(JSON.parse(localStorage.getItem(STORE_KEY) || "{}")); } catch (e) { answers = {}; }
+  }
+
+  function cleanAnswers(raw) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("无效答案");
+    var out = {};
+    SECTIONS.forEach(function(sec) { sec.qs.forEach(function(q) {
+      var v = raw[q.id];
+      if (q.type === "text" || q.type === "area") { if (typeof v === "string") out[q.id] = v.trim().slice(0, q.id === "name" ? 30 : 500); }
+      else if (q.type === "multi") { if (typeof v === "string") v = [v]; if (Array.isArray(v)) out[q.id] = q.opts.filter(function(o) { return v.indexOf(o) >= 0; }); }
+      else if (q.type === "single" && q.opts.indexOf(v) >= 0) out[q.id] = v;
+      else if (q.type === "slider" && Number.isInteger(v) && v >= q.min && v <= q.max) out[q.id] = v;
+    }); });
+    return out;
+  }
+  function answered(q) { var v = answers[q.id]; return Array.isArray(v) ? v.length > 0 : v !== undefined && v !== ""; }
+  function answerCount() { return SECTIONS.reduce(function(n, sec) { return n + sec.qs.filter(answered).length; }, 0); }
+  function save() {
+    if (receivedMode) return;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(answers)); } catch (e) {}
+  }
+
+  async function packLink() {
+    try { return window.location.href.split("#")[0].split("?")[0] + await encodeShare(answers); }
+    catch(e) { return ""; }
+  }
+
+  /* =====================================================
+     渲染问卷
+  ===================================================== */
+  var quizArea = document.getElementById("quizArea");
+  var progressWrap = document.getElementById("progressWrap");
+  var pbarFill = document.getElementById("pbarFill");
+  var progressLbl = document.getElementById("progressLbl");
+
+  function buildQuiz() {
+    quizArea.innerHTML = "";
+    SECTIONS.forEach(function (sec, si) {
+      var card = document.createElement("div");
+      card.className = "section-card";
+      card.id = "sec" + si;
+
+      var tag = document.createElement("div"); tag.className = "sec-tag"; tag.textContent = sec.tag;
+      var title = document.createElement("div"); title.className = "sec-title"; title.textContent = sec.title;
+      var sub = document.createElement("div"); sub.className = "sec-sub"; sub.textContent = sec.sub;
+      card.appendChild(tag); card.appendChild(title); card.appendChild(sub);
+
+      sec.qs.forEach(function (q) {
+        var qDiv = document.createElement("div");
+        qDiv.className = "q";
+        var label = document.createElement("div");
+        label.className = "q-label"; label.id = "label-" + q.id; qDiv.id = "question-" + q.id;
+        label.textContent = q.label;
+        if (q.must) {
+          var m = document.createElement("span"); m.className = "must"; m.textContent = "必填";
+          label.appendChild(m);
+        }
+        qDiv.appendChild(label);
+
+        if (q.type === "single" || q.type === "multi") {
+          var chips = document.createElement("div"); chips.className = "chips"; chips.setAttribute("role", "group"); chips.setAttribute("aria-labelledby", label.id);
+          q.opts.forEach(function (opt) {
+            var c = document.createElement("button"); c.type = "button";
+            c.className = "chip" + (q.type === "multi" ? " sage" : "");
+            c.textContent = opt;
+            c.addEventListener("click", function () {
+              if (q.type === "single") {
+                var selected = answers[q.id] === opt;
+                chips.querySelectorAll(".chip").forEach(function (x) { x.classList.remove("on"); });
+                if (selected) delete answers[q.id];
+                else { c.classList.add("on"); answers[q.id] = opt; }
+              } else {
+                c.classList.toggle("on");
+                var arr2 = answers[q.id] || [];
+                if (arr2.indexOf(opt) >= 0) { arr2 = arr2.filter(function (v) { return v !== opt; }); }
+                else { arr2.push(opt); }
+                answers[q.id] = arr2;
+              }
+              chips.querySelectorAll(".chip").forEach(function(x) { x.setAttribute("aria-pressed", String(x.classList.contains("on"))); }); hideErr(qDiv); save();
+            });
+            var saved = answers[q.id];
+            if (q.type === "single" && saved === opt) c.classList.add("on");
+            if (q.type === "multi" && Array.isArray(saved) && saved.indexOf(opt) >= 0) c.classList.add("on");
+            c.setAttribute("aria-pressed", String(c.classList.contains("on"))); chips.appendChild(c);
+          });
+          qDiv.appendChild(chips);
+        }
+
+        if (q.type === "text" || q.type === "area") {
+          var input = document.createElement(q.type === "area" ? "textarea" : "input");
+          if (q.type === "text") input.type = "text";
+          if (q.type === "area") input.rows = 3;
+          input.placeholder = q.ph || ""; input.setAttribute("aria-labelledby", label.id); input.maxLength = q.id === "name" ? 30 : 500;
+          input.value = answers[q.id] || "";
+          input.addEventListener("input", function () {
+            answers[q.id] = input.value.trim();
+            hideErr(qDiv); save();
+          });
+          qDiv.appendChild(input);
+        }
+
+        if (q.type === "slider") {
+          var val = answers[q.id] || Math.ceil((q.min + q.max) / 2);
+
+          var range = document.createElement("input");
+          range.setAttribute("aria-labelledby", label.id); range.type = "range"; range.min = q.min; range.max = q.max; range.value = val;
+          var rv = document.createElement("div"); rv.className = "range-val";
+          function hearts(n) { var s = ""; for (var h = 0; h < n; h++) s += "♡"; return s; }
+          rv.textContent = answers[q.id] === undefined ? "尚未作答 · 拖动滑块选择，或点击确认当前分值" : hearts(Number(val)) + "（" + val + "/" + q.max + "）";
+          range.addEventListener("input", function () {
+            answers[q.id] = Number(range.value);
+            rv.textContent = hearts(Number(range.value)) + "（" + range.value + "/" + q.max + "）";
+            save();
+          });
+          var meta = document.createElement("div");
+          meta.className = "range-meta";
+          var lo = document.createElement("span"); lo.textContent = q.lo;
+          var hi = document.createElement("span"); hi.textContent = q.hi;
+          meta.appendChild(lo); meta.appendChild(hi);
+          qDiv.appendChild(range); qDiv.appendChild(rv); qDiv.appendChild(meta);
+          var confirmRange = document.createElement("button"); confirmRange.className = "chip"; confirmRange.textContent = "确认当前分值";
+          confirmRange.addEventListener("click", function() { answers[q.id] = Number(range.value); rv.textContent = hearts(Number(range.value)) + "（" + range.value + "/" + q.max + "）"; save(); });
+          var clearRange = document.createElement("button"); clearRange.className = "chip"; clearRange.textContent = "清除此题";
+          clearRange.addEventListener("click", function() { delete answers[q.id]; rv.textContent = "尚未作答"; save(); });
+          qDiv.appendChild(confirmRange); qDiv.appendChild(clearRange);
+        }
+
+        var err = document.createElement("div");
+        err.className = "err-tip"; err.textContent = "这道题还没作答哦";
+        qDiv.appendChild(err);
+        card.appendChild(qDiv);
+      });
+
+      var nav = document.createElement("div");
+      nav.className = "nav-row";
+      if (si > 0) {
+        var prev = document.createElement("button");
+        prev.className = "btn ghost"; prev.textContent = "上一部分";
+        prev.addEventListener("click", function () { showSection(si - 1); });
+        nav.appendChild(prev);
+      } else {
+        var back = document.createElement("button");
+        back.className = "btn ghost"; back.textContent = "返回封面";
+        back.addEventListener("click", function () {
+          quizArea.innerHTML = ""; progressWrap.style.display = "none";
+          document.getElementById("intro").style.display = "";
+        });
+        nav.appendChild(back);
+      }
+      var next = document.createElement("button");
+      next.className = "btn";
+      next.textContent = si === SECTIONS.length - 1 ? "交卷，看看结果 →" : "下一部分 →";
+      next.addEventListener("click", function () {
+        if (!validateSection(si)) return;
+        if (si === SECTIONS.length - 1) {
+          var missing = totalQ - answerCount();
+          var old = card.querySelector(".review-missing"); if (old) old.remove();
+          if (!missing) { buildReport(false); return; }
+          var panel = document.createElement("div"); panel.className = "review-missing r-card"; panel.setAttribute("role", "status");
+          var message = document.createElement("p"); message.textContent = "还有 " + missing + " 题未回答，可以跳过。未答题不会用于推断偏好。"; panel.appendChild(message);
+          var proceed = document.createElement("button"); proceed.className = "btn"; proceed.textContent = "继续生成"; proceed.onclick = function() { buildReport(false); };
+          var back = document.createElement("button"); back.className = "btn ghost"; back.textContent = "返回补充"; back.onclick = function() { var first = SECTIONS.findIndex(function(sec) { return sec.qs.some(function(q) { return !answered(q); }); }); showSection(first); };
+          panel.appendChild(proceed); panel.appendChild(back); card.appendChild(panel); panel.scrollIntoView({block: "center"});
+        }
+        else { showSection(si + 1); }
+      });
+      nav.appendChild(next);
+      card.appendChild(nav);
+      quizArea.appendChild(card);
+    });
+  }
+
+  function validateSection(si) {
+    var bad = null;
+    SECTIONS[si].qs.forEach(function (q) {
+      if (q.must) {
+        var v = answers[q.id];
+        var empty = v === undefined || v === "" || (Array.isArray(v) && v.length === 0);
+        if (empty && bad === null) {
+          var card = document.getElementById("sec" + si);
+          var qEls = card.querySelectorAll(".q");
+          for (var i = 0; i < SECTIONS[si].qs.length; i++) {
+            if (SECTIONS[si].qs[i].id === q.id) { bad = qEls[i]; break; }
+          }
+        }
+      }
+    });
+    if (bad) {
+      bad.querySelector(".err-tip").style.display = "block";
+      bad.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    return true;
+  }
+
+  function hideErr(qDiv) {
+    var err = qDiv.querySelector(".err-tip");
+    if (err) err.style.display = "none";
+  }
+
+  function showSection(si) {
+    document.getElementById("intro").style.display = "none";
+    document.getElementById("report").style.display = "none";
+    progressWrap.style.display = "block";
+    quizArea.querySelectorAll(".section-card").forEach(function (c) { c.classList.remove("show"); });
+    document.getElementById("sec" + si).classList.add("show");
+    var pct = Math.round((si / SECTIONS.length) * 100);
+    pbarFill.style.width = pct + "%";
+    progressLbl.textContent = "PART " + (si + 1) + " / " + SECTIONS.length + " · " + SECTIONS[si].title;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.getElementById("startBtn").addEventListener("click", function () {
+    buildQuiz();
+    showSection(0);
+  });
+
+  /* =====================================================
+     生成报告
+  ===================================================== */
+  function arr(id) { var v = answers[id]; return Array.isArray(v) ? v : []; }
+  function one(id) { return answers[id] || ""; }
+  function has(id, v) { return arr(id).indexOf(v) >= 0; }
+
+  function buildReport(fromLink) {
+    var name = one("name") || "神秘的 TA";
+    var body = document.getElementById("reportBody"); body.replaceChildren();
+    function card(title, lines) {
+      var box = document.createElement("section"); box.className = "r-card";
+      var h = document.createElement("h3"); h.textContent = title; box.appendChild(h);
+      lines.forEach(function(line) { var p = document.createElement("p"); p.textContent = line; box.appendChild(p); }); body.appendChild(box);
+    }
+    card("① TA 的喜好速览", ["已回答 " + answerCount() + " / " + totalQ + " 题。空缺表示尚未了解。以下建议仅供参考，安排前请双方确认。"]);
+    var plans = arr("dateType").map(function(t) { return "可以一起考虑：" + t + "。先确认时间、预算和彼此的意愿。"; });
+    if (!plans.length) plans.push("约会类型尚未了解。先问问 TA 这次想怎么度过，再一起决定。");
+    plans.push("安排节奏：" + (one("rhythm") || "尚未了解") + "；作息：" + (one("clock") || "尚未了解") + "；消费态度：" + (one("budget") || "尚未了解"));
+    card("② 可以一起商量的约会", plans);
+    card("③ 吃喝备忘", ["喜欢的口味：" + (arr("taste").join("、") || "尚未了解"), "饮品：" + (arr("drink").join("、") || "尚未了解") + "。点单前再次确认。", "甜品偏好：" + (answers.sweet === undefined ? "尚未了解" : answers.sweet + "/5（本人选择）"), "忌口或过敏：" + (one("avoid") || "尚未了解，点菜前请确认")]);
+    card("④ 可以一起聊的话题", ["音乐：" + (arr("music").join("、") || "尚未了解"), "最近在听：" + (one("singer") || "尚未了解"), "影视：" + (arr("movie").join("、") || "尚未了解"), "休闲方式：" + (arr("hobby").join("、") || "尚未了解")]);
+    card("⑤ 相处与心意", ["当前阶段：" + (one("rel") || "尚未了解"), "性格：" + (arr("personality").join("、") || "尚未了解"), "充电方式：" + (one("energy") || "尚未了解"), "想去的地方：" + (one("travel") || "尚未了解"), "礼物偏好：" + (one("gift") || "尚未了解"), "最近的小心愿：" + (one("wish") || "尚未了解")]);
+    card("⑥ 相处边界", [one("mine") || "尚未填写。涉及拍照、身体接触或私人空间时，请先征求同意。"]);
+    card("⑦ 理想的约会", [one("dream") || "尚未了解，留给之后慢慢聊。"]);
+    document.getElementById("rTitle").textContent = "「" + name + "」的喜好档案";
+    document.getElementById("rStamp").textContent = fromLink ? "SHARED WITH YOU · 一份分享的心意" : "SURVEY COMPLETE · 你已交卷";
+    document.getElementById("rSub").textContent = fromLink ? "这是对方主动分享的回答，请尊重这些偏好与边界。" : "先核对这份档案，再决定是否分享；也可以返回修改。";
+    document.getElementById("sendBox").classList.toggle("show", !fromLink);
+    document.getElementById("retakeBtn").textContent = fromLink ? "我也想填一份" : "返回修改";
+    document.getElementById("intro").style.display = "none"; quizArea.innerHTML = "";
+    progressWrap.style.display = "none"; document.getElementById("report").style.display = "block";
+    window.scrollTo({top: 0, behavior: "smooth"});
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  /* ---------- 「TA」复制结果链接回传 ---------- */
+  document.getElementById("sendLinkBtn").addEventListener("click", async function () {
+    var link = await packLink();
+    var btn = document.getElementById("sendLinkBtn");
+    if (!link) { btn.textContent = "生成链接失败，请截图保存"; return; }
+    var text = "问卷我填好啦 ✿ " + link;
+    function done() { btn.textContent = "已复制 ✓ 去粘贴发出去吧"; setTimeout(function () { btn.textContent = "复制精简链接 · 发给出题人"; }, 2600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { if (fallbackCopy(text)) done(); else btn.textContent = "复制失败，请手动复制下方链接"; });
+    } else { if (fallbackCopy(text)) done(); else btn.textContent = "复制失败，请手动复制下方链接"; }
+  });
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    if (!ok) { var manual = document.getElementById("manualLink"); if (!manual) { manual = document.createElement("textarea"); manual.id = "manualLink"; manual.readOnly = true; manual.setAttribute("aria-label", "手动复制结果链接"); document.getElementById("sendBox").appendChild(manual); } manual.value = text; manual.select(); }
+    return ok;
+  }
+
+  /* ---------- 保存为图片（Canvas 绘制分享卡） ---------- */
+  document.getElementById("saveImgBtn").addEventListener("click", function () {
+    var cv = document.createElement("canvas"), ctx = cv.getContext("2d"), width = 750;
+    ctx.font = '26px "Microsoft YaHei",sans-serif';
+    var lines = [];
+    [document.getElementById("rTitle").textContent].concat(Array.from(document.querySelectorAll("#reportBody h3, #reportBody p")).map(function(el) { return el.textContent; })).forEach(function(text) {
+      var line = "";
+      Array.from(text).forEach(function(ch) { if (ctx.measureText(line + ch).width > width - 100 && line) { lines.push(line); line = ""; } line += ch; });
+      if (line) lines.push(line); lines.push("");
+    });
+    cv.width = width; cv.height = 120 + lines.length * 42;
+    ctx.fillStyle = "#faf9f7"; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = "#3a3733"; ctx.font = '26px "Microsoft YaHei",sans-serif';
+    lines.forEach(function(line, i) { ctx.fillText(line, 50, 70 + i * 42); });
+    var data = cv.toDataURL("image/png");
+    var preview = document.getElementById("imagePreview");
+    if (!preview) { preview = document.createElement("div"); preview.id = "imagePreview"; preview.className = "r-card"; document.getElementById("report").appendChild(preview); }
+    preview.replaceChildren();
+    var tip = document.createElement("p"); tip.textContent = "档案图片已生成。若未自动下载，可长按或右键下方图片保存。";
+    var img = document.createElement("img"); img.alt = "完整喜好档案图片"; img.style.width = "100%"; img.src = data; preview.appendChild(tip); preview.appendChild(img);
+    var a = document.createElement("a"); a.download = "喜好档案.png"; a.href = data; a.click();
+    var btn = document.getElementById("saveImgBtn"); btn.textContent = "已生成图片 · 请查看下载";
+    setTimeout(function() { btn.textContent = "保存为图片"; }, 2400);
+  });
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* ---------- 重新填写 ---------- */
+  document.getElementById("retakeBtn").addEventListener("click", function () {
+    if (receivedMode) {
+      // 出题人从「回传链接」点进来：清掉链接，给他一份空白问卷
+      window.location.href = window.location.href.split("#")[0];
+      return;
+    }
+    buildQuiz(); showSection(0);
+    document.getElementById("sendBox").classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  /* ---------- 启动：若是回传链接，直接展示结果 ---------- */
+  if (receivedMode) {
+    document.getElementById("intro").style.display = "none";
+    buildReport(true);
+  }
+
+})();
+</script>
+</body>
+</html>
