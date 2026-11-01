@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
+<meta name="theme-color" content="#fff5f8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>为了更懂你 · 一份小小的问卷</title>
 <meta name="description" content="有人认真出了一份问卷，想更懂你一点点。填完把结果发回去就行。" />
@@ -161,9 +162,183 @@
   .progress-inner .lbl { white-space: normal; }
   @media(max-width: 520px) { #intro { padding-top: 50px; } .stamp { font-size: 10px; letter-spacing: 2px; padding: 5px 12px; } .wrap { padding-inline: 16px; } .nav-row .btn { padding: 12px 18px; letter-spacing: 0; } .r-card { padding: 22px 18px; overflow-wrap: anywhere; } .send-box { padding: 22px 14px; } .btn { max-width: 100%; } }
   @media(prefers-reduced-motion: reduce) { *,html { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+</style><style id="pink-theme">
+/* Strawberry letter theme. No external fonts, images, or trackers. */
+:root {
+  --bg: #fff5f8;
+  --surface: #fffdfd;
+  --ink: #583346;
+  --ink-soft: #886474;
+  --line: #f3d9e3;
+  --rose: #e780a3;
+  --rose-deep: #b93668;
+  --rose-soft: #ffe5ee;
+  --sage: #d65a88;
+  --sage-soft: #fff0f5;
+  --radius: 26px;
+  --font-serif: "Microsoft YaHei", "PingFang SC", sans-serif;
+  --font-sans: "Microsoft YaHei", "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+body {
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image: linear-gradient(90deg, #efb7cc12 50%, transparent 50%), linear-gradient(#efb7cc12 50%, transparent 50%);
+  background-size: 32px 32px;
+}
+button, input, textarea { -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; }
+.wrap { max-width: 1040px; padding: 0 28px 50px; }
+.site-header {
+  max-width: 1040px; margin: 0 auto; padding: 25px 28px 24px;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.brand { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; background: #fff; border: 1px solid var(--line); border-radius: 12px; color: var(--rose-deep); box-shadow: 0 3px 0 #f8dce7; }
+.header-note { color: var(--ink-soft); font-size: 11px; letter-spacing: 2px; }
+#intro {
+  position: relative; text-align: left; padding: 26px 42px 24px;
+  border: 1px solid #f3cbdc; border-radius: 32px;
+  background: linear-gradient(135deg, #fffefe, #fffafb 65%, #fff2f7);
+  box-shadow: 0 12px 42px #d47b9b12, 0 4px 0 #f9dce8;
+}
+.cover-topline { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px dashed #edc9d8; color: var(--ink-soft); font-size: 12px; letter-spacing: 1px; }
+.tiny-heart { color: var(--rose-deep); margin-right: 6px; }
+.letter-number { font-size: 10px; letter-spacing: 2px; color: var(--rose-deep); }
+.cover-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: center; padding: 32px 0 24px; }
+.intro-copy { min-width: 0; }
+.stamp { padding: 0; border: 0; margin-bottom: 12px; font-size: 10px; color: #a34b6c; letter-spacing: 2.6px; }
+#intro h1 { font-size: clamp(28px, 3.25vw, 39px); font-weight: 800; letter-spacing: 1px; line-height: 1.5; }
+#intro h1 em { position: relative; display: inline-block; color: var(--rose-deep); z-index: 0; }
+#intro h1 em::after { content: ""; position: absolute; height: 12px; left: -3px; right: -3px; bottom: 4px; border-radius: 99px; background: #ffd6e5; z-index: -1; transform: rotate(-2deg); }
+.title-heart { display: inline-block; margin-left: 10px; color: #e780a3; font-size: .75em; vertical-align: 4px; transform: rotate(12deg); }
+#intro p.lead { max-width: 400px; margin: 16px 0 0; font-size: 14px; line-height: 1.95; color: #7c5869; }
+.intro-meta { justify-content: flex-start; margin-top: 23px; gap: 0; font-size: 11px; }
+.intro-meta > div { min-width: 77px; padding: 0 21px; border-right: 1px solid var(--line); }
+.intro-meta > div:first-child { padding-left: 0; }
+.intro-meta > div:last-child { border: 0; }
+.intro-meta b { font-family: var(--font-sans); font-size: 22px; font-weight: 700; color: var(--rose-deep); margin-bottom: 2px; }
+.start-btn { margin-top: 24px; }
+.btn {
+  min-height: 48px; padding: 12px 27px; border: 1px solid transparent;
+  background: #c34474; color: #fff; font-size: 14px; font-weight: 600; letter-spacing: .5px;
+  box-shadow: 0 4px 0 #a62c5a, 0 7px 16px #c344741a;
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.btn:hover { opacity: 1; background: #b63868; transform: translateY(-2px); box-shadow: 0 6px 0 #a62c5a, 0 10px 18px #c3447420; }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #a62c5a; }
+.btn.ghost { background: #fffafd; border: 1px solid #ecc3d4; color: #95516e; box-shadow: 0 3px 0 #f3dce5; }
+.btn.ghost:hover { background: #fff0f6; color: var(--rose-deep); border-color: #df91af; }
+#startBtn { min-width: 205px; }
+#startBtn::after { content: "→"; display: inline-block; margin-left: 24px; }
+.intro-art { position: relative; text-align: center; padding: 16px 0 6px; }
+.art-caption { display: inline-block; position: relative; padding: 6px 14px; border: 1px solid #f0c7d8; border-radius: 10px 10px 10px 0; background: #fff; color: #9a506d; font-size: 12px; transform: rotate(4deg); }
+.bunny-letter { display: block; width: 100%; max-width: 340px; height: auto; margin: 2px auto 0; overflow: visible; animation: letter-float 5s ease-in-out 1; }
+.art-footnote { margin-top: -5px; color: #a76d83; font-size: 11px; letter-spacing: 2px; }
+.privacy-note { display: flex; align-items: flex-start; gap: 8px; border-top: 1px dashed #edc9d8; padding-top: 17px; color: #886474; font-size: 11px; line-height: 1.9; }
+.privacy-note .lock { color: var(--rose-deep); flex: none; }
+@keyframes letter-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-7px) rotate(1deg); } }
+#progressWrap { background: #fff5f8f2; border-bottom: 1px solid #f2cfdf; padding: 14px 0; }
+.progress-inner { max-width: 748px; gap: 16px; }
+.progress-inner .lbl { color: #9d4a6c; font-size: 12px; line-height: 1.6; flex-shrink: 0; }
+.pbar { height: 8px; min-width: 35px; background: #f6dce7; }
+.pbar-fill { background: linear-gradient(90deg, #f1a5c0, #d4598c); }
+#quizArea, #report { max-width: 704px; margin-inline: auto; }
+.section-card { position: relative; padding: 34px 32px; margin-top: 18px; border-color: #f0cadb; box-shadow: 0 5px 0 #f9e0e9, 0 14px 32px #bf6e9010; }
+.sec-tag { display: inline-block; padding: 3px 12px; background: #fff0f6; border: 1px solid #f7d6e4; border-radius: 999px; color: #aa4c73; font-size: 11px; letter-spacing: 2px; }
+.sec-title { font-size: 24px; font-weight: 750; margin: 12px 0 5px; letter-spacing: 1px; }
+.sec-sub { font-size: 13px; margin-bottom: 28px; }
+.q { margin-bottom: 26px; }
+.q-label { color: #663a4e; line-height: 1.85; font-size: 14px; }
+.q-label .must { display: inline-block; padding: 0 7px; margin-left: 7px; background: #fff0f5; color: #b93668; border-radius: 6px; font-size: 10px; }
+.chips { gap: 9px; }
+.chip { font-size: 13px; padding: 9px 15px; background: #fffafd; border-color: #f0d8e2; color: #805568; border-radius: 15px; min-height: 44px; transition: border-color .15s, color .15s, background .15s, transform .15s; }
+.chip:hover { border-color: #df8eae; background: #fff1f6; }
+.chip.on, .chip.sage.on { background: #ffe4ee; border-color: #c85380; color: #a52a58; box-shadow: inset 0 0 0 1px #c8538033; }
+.chip:active { transform: scale(.97); }
+input[type="text"], textarea { font-size: 16px; border-radius: 15px; background: #fff8fb; padding: 13px 15px; border-color: #f0d5e0; }
+input[type="text"]::placeholder, textarea::placeholder { color: #a58090; font-size: 13px; }
+input[type="text"]:focus, textarea:focus { border-color: #cf7097; box-shadow: 0 0 0 4px #fbe3ed; }
+textarea { min-height: 104px; }
+input[type="range"] { height: 7px; margin: 14px 0; background: #f3d2e0; }
+input[type="range"]::-webkit-slider-thumb { width: 24px; height: 24px; background: #d95a8b; box-shadow: 0 0 0 1px #d95a8b, 0 3px 8px #d95a8b30; }
+input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 3px solid white; border-radius: 50%; background: #d95a8b; box-shadow: 0 0 0 1px #d95a8b; }
+.range-val { font-family: var(--font-sans); font-size: 13px; line-height: 1.9; }
+.range-meta { margin: 5px 0 12px; }
+.nav-row { padding-top: 22px; border-top: 1px dashed #eed1de; }
+:focus-visible { outline: 3px solid #b93668; outline-offset: 4px; }
+#report { margin-top: 20px; }
+.r-head { padding: 18px 0 28px; }
+.r-head::before { content: "♡"; display: block; margin-bottom: 10px; color: #c84e7d; font-size: 38px; line-height: 1; }
+.r-head .stamp2 { color: #a24368; border-color: #edbfd2; background: #fff9fc; font-size: 10px; letter-spacing: 1.8px; padding: 6px 14px; margin-bottom: 15px; }
+.r-head h2 { font-size: clamp(23px, 5vw, 30px); font-weight: 750; letter-spacing: 1px; overflow-wrap: anywhere; }
+.r-head p { font-size: 12px; }
+.r-card { border-color: #f0cddd; border-radius: 22px; padding: 25px 27px; box-shadow: 0 4px 0 #f9e2eb; }
+.r-card h3 { font-size: 16px; letter-spacing: .5px; color: #aa3b66; }
+.r-card p { color: #684355; line-height: 1.95; overflow-wrap: anywhere; }
+.r-card p + p { margin-top: 9px; }
+#reportBody .r-card:nth-child(even) { background: #fff9fc; }
+.send-box { background: #ffedf4; border: 1px dashed #dc91af; border-radius: 24px; padding: 25px 22px; }
+.send-box .big { font-size: 17px; letter-spacing: 1px; color: #a93a64; font-weight: 700; }
+.send-box p { font-size: 12px; line-height: 1.9; }
+.report-actions { gap: 14px; margin-bottom: 22px; }
+#imagePreview { margin-top: 25px; }
+#imagePreview img { display: block; margin-top: 15px; border-radius: 16px; border: 1px solid var(--line); }
+#manualLink { margin-top: 18px; overflow-wrap: anywhere; }
+footer { max-width: 760px; margin: 0 auto; border: 0; padding: 9px 22px 30px; color: #987283; font-size: 10px; }
+footer .sig { font-size: 12px; letter-spacing: 1px; color: #a3647d; }
+.footer-heart { color: #d7779b; padding: 0 7px; }
+@media (max-width: 700px) {
+  .site-header { padding: 20px 20px; }
+  .header-note { font-size: 9px; letter-spacing: 1px; }
+  .brand { font-size: 14px; }
+  .brand-mark { width: 30px; height: 30px; border-radius: 10px; }
+  .wrap { padding: 0 16px 32px; }
+  #intro { padding: 20px 23px; border-radius: 27px; }
+  .cover-topline { font-size: 11px; padding-bottom: 13px; }
+  .letter-number { font-size: 9px; }
+  .cover-grid { grid-template-columns: 1fr; gap: 2px; padding: 10px 0 23px; }
+  .intro-art { grid-row: 1; padding: 0; }
+  .bunny-letter { width: 190px; margin-top: -5px; }
+  .art-caption { position: absolute; left: calc(50% + 32px); top: 23px; width: 98px; padding: 5px 6px; font-size: 9px; transform: rotate(7deg); }
+  .art-footnote { display: none; }
+  .intro-copy { text-align: center; }
+  .stamp { margin-bottom: 6px; font-size: 9px; letter-spacing: 2px; }
+  #intro h1 { font-size: clamp(27px, 7.6vw, 36px); line-height: 1.5; letter-spacing: .5px; }
+  .title-heart { display: none; }
+  #intro p.lead { margin: 13px auto 0; max-width: 360px; font-size: 12px; line-height: 1.9; }
+  .intro-meta { justify-content: center; margin-top: 18px; }
+  .intro-meta > div { min-width: 82px; padding: 0 19px; }
+  .intro-meta > div:first-child { padding-left: 19px; }
+  .intro-meta b { font-size: 21px; }
+  .start-btn { margin-top: 20px; }
+  #startBtn { width: 100%; max-width: 290px; min-height: 49px; }
+  .privacy-note { padding-top: 14px; font-size: 10px; text-align: left; }
+  .progress-inner { padding-inline: 20px; gap: 12px; }
+  .progress-inner .lbl { font-size: 11px; flex-shrink: 1; }
+  .pbar { flex: 1 0 50px; }
+  .section-card { padding: 27px 20px; border-radius: 24px; }
+  .sec-title { font-size: 22px; }
+  .chip { padding: 9px 12px; }
+  .nav-row { gap: 10px; }
+  .nav-row .btn { padding: 12px 16px; font-size: 13px; letter-spacing: 0; }
+  .r-card { padding: 22px 19px; }
+  .r-card h3 { font-size: 15px; }
+  .r-card p { font-size: 13px; }
+  .send-box { padding: 22px 16px; }
+  .send-box .btn { padding: 12px 20px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, html { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
 </style>
 </head>
 <body>
+
+<header class="site-header" aria-label="网站名称">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">♡</span> 心动小问卷</div>
+  <span class="header-note">MADE WITH A LITTLE LOVE</span>
+</header>
 
 <div id="progressWrap">
   <div class="progress-inner">
@@ -176,18 +351,51 @@
 
   <!-- ============ 封面（给「TA」看） ============ -->
   <div id="intro">
-    <span class="stamp">SOMEONE LIKES YOU · 问卷编号 001</span>
-    <h1>听说，<br />有人想更<em>懂你</em>一点点</h1>
-    <p class="lead">有个人认真出了一份问卷——关于你喜欢的口味、音乐、性格节奏，还有约会的种种。没有对错，凭直觉选就好。填完把结果发回去，剩下的交给 TA。</p>
-    <div class="intro-meta">
-      <div><b id="metaQ">20</b>道题目</div>
-      <div><b>5</b>大板块</div>
-      <div><b>~5</b>分钟</div>
+    <div class="cover-topline"><span><span class="tiny-heart" aria-hidden="true">♡</span> 有一份小心意，想送给你</span><span class="letter-number">LETTER NO. 001</span></div>
+    <div class="cover-grid">
+      <div class="intro-copy">
+        <span class="stamp">A LITTLE MORE ABOUT YOU</span>
+        <h1>听说，<br />有人想更<em>懂你</em>一点点<span class="title-heart" aria-hidden="true">♡</span></h1>
+        <p class="lead">喜欢的口味、循环的歌，还有让你心动的小细节。<br />把关于你的小小偏好，装进这封粉色来信。<br />没有标准答案，做你自己就好。</p>
+        <div class="intro-meta">
+          <div><b id="metaQ">21</b>道小问题</div>
+          <div><b>5</b>个小章节</div>
+          <div><b>~5</b>分钟就好</div>
+        </div>
+        <div class="start-btn"><button class="btn" id="startBtn">拆开这份小心意</button></div>
+      </div>
+      <div class="intro-art" aria-hidden="true">
+        <span class="art-caption">想多了解你一点 ♡</span>
+        <svg class="bunny-letter" viewBox="0 0 340 300" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <circle cx="173" cy="153" r="123" fill="#FFEAF2"/>
+          <circle cx="55" cy="83" r="6" fill="#F8CCDD"/>
+          <circle cx="285" cy="221" r="5" fill="#F4B7D0"/>
+          <path d="M282 72V88M274 80H290M65 212V224M59 218H71" stroke="#DA94AF" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M41 147C32 139 23 149 41 160C59 149 50 139 41 147Z" fill="#EFA5C2"/>
+          <path d="M287 124C279 117 271 126 287 136C303 126 295 117 287 124Z" fill="#F0B4CD"/>
+          <ellipse cx="174" cy="266" rx="98" ry="11" fill="#EFB9CF" fill-opacity=".38"/>
+          <ellipse cx="134" cy="96" rx="21" ry="57" transform="rotate(-14 134 96)" fill="#FFFDFC" stroke="#D78CA8" stroke-width="2.5"/>
+          <ellipse cx="134" cy="96" rx="9" ry="39" transform="rotate(-14 134 96)" fill="#F9D5E2"/>
+          <ellipse cx="202" cy="94" rx="21" ry="58" transform="rotate(13 202 94)" fill="#FFFDFC" stroke="#D78CA8" stroke-width="2.5"/>
+          <ellipse cx="202" cy="94" rx="9" ry="40" transform="rotate(13 202 94)" fill="#F9D5E2"/>
+          <ellipse cx="169" cy="151" rx="73" ry="59" fill="#FFFDFC" stroke="#D78CA8" stroke-width="2.5"/>
+          <ellipse cx="122" cy="163" rx="14" ry="8" fill="#F9B7CF" fill-opacity=".75"/>
+          <ellipse cx="216" cy="163" rx="14" ry="8" fill="#F9B7CF" fill-opacity=".75"/>
+          <path d="M142 147V153M195 147V153" stroke="#694355" stroke-width="5.5" stroke-linecap="round"/>
+          <path d="M165 158L169 161L173 158" stroke="#C76C93" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M169 162V166M161 166C164 170 167 170 169 166C172 170 175 170 178 166" stroke="#876072" stroke-width="2" stroke-linecap="round"/>
+          <path d="M211 113L222 100L229 111L237 100L244 115L229 121Z" fill="#EFA3C0" stroke="#D58BA7" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="82" y="183" width="178" height="79" rx="12" transform="rotate(-5 82 183)" fill="#F5B5CE" stroke="#CF7A9C" stroke-width="2.5"/>
+          <path d="M86 188L175 228L256 175" stroke="#CF7A9C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M91 254L147 216M258 240L211 210" stroke="#D98BAD" stroke-width="2"/>
+          <path d="M175 212C163 199 149 213 175 232C201 213 187 199 175 212Z" fill="#C54979" stroke="#B43B69" stroke-width="1.5"/>
+          <ellipse cx="98" cy="205" rx="13" ry="19" transform="rotate(-30 98 205)" fill="#FFFDFC" stroke="#D78CA8" stroke-width="2.5"/>
+          <ellipse cx="247" cy="194" rx="13" ry="19" transform="rotate(27 247 194)" fill="#FFFDFC" stroke="#D78CA8" stroke-width="2.5"/>
+        </svg>
+        <p class="art-footnote">把心动，藏进每一个答案里</p>
+      </div>
     </div>
-    <div class="start-btn">
-      <button class="btn" id="startBtn">开始作答</button>
-    </div>
-    <p style="margin-top:18px;font-size:12px;color:var(--ink-soft);">草稿保存在当前浏览器，可随时修改。除昵称外均可跳过。<br>分享链接包含未加密的答案，拿到链接的人都能查看；请勿填写住址、联系方式等私密信息。</p>
+    <div class="privacy-note"><span class="lock" aria-hidden="true">♡</span><p>草稿只保存在当前浏览器，除昵称外都可以跳过。<br />结果需要你主动复制分享；链接里的答案未加密，请只发给信任的人，不填写住址、联系方式等私密信息。</p></div>
   </div>
 
   <!-- ============ 问卷 ============ -->
@@ -218,8 +426,8 @@
 </div>
 
 <footer>
-  <div class="sig">—— 认真回答的人，会被认真对待 ——</div>
-  约会情报局 · 问卷编号 001
+  <div class="sig">认真回答的人，会被认真对待 <span class="footer-heart" aria-hidden="true">♡</span></div>
+  心动小问卷 · 只为多懂你一点点
 </footer>
 
 <script>
@@ -640,8 +848,8 @@
       if (line) lines.push(line); lines.push("");
     });
     cv.width = width; cv.height = 120 + lines.length * 42;
-    ctx.fillStyle = "#faf9f7"; ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.fillStyle = "#3a3733"; ctx.font = '26px "Microsoft YaHei",sans-serif';
+    ctx.fillStyle = "#fff1f6"; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = "#684355"; ctx.font = '26px "Microsoft YaHei",sans-serif';
     lines.forEach(function(line, i) { ctx.fillText(line, 50, 70 + i * 42); });
     var data = cv.toDataURL("image/png");
     var preview = document.getElementById("imagePreview");
